@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+# Simple Python Script to read ~/.fixscr and create a pattern of screen setups
+# Then easly switch between then. For more information see github.com/h0m3/fixscr
+#
+# Copyright (C) 2017  Artur 'h0m3' Paiva
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Feel free to contact me at dr.hoome@gmail.com.
+#
+
+from subprocess import check_call, check_output, DEVNULL, CalledProcessError, STDOUT
+from sys import argv
+from os import getenv
+from configparser import ConfigParser
+from time import sleep
+
+# Check if xrandr is installed
+def check_xrandr():
+    try:
+        check_call(["xrandr"], stdout=DEVNULL, stderr=DEVNULL)
+        return True
+    except (CalledProcessError, FileNotFoundError):
+        return False
+
+
+# Check if screen is connected
+def is_connected(screen):
+    xrandr = check_output(["xrandr"])
+    for line in xrandr.decode().splitlines():
+        if screen in line:
+            return not("disconnected" in line)
+
+
+# Set xrandr mode for a Screen
+def set_xrandr(screen, mode, brightness=1, refresh=60, primary=False, pos="0x0"):
+    cmd = ["xrandr",
+        "--output", screen,
+        "--mode", mode,
+        "--refresh", str(refresh),
+        "--brightness", str(brightness),
+        "--pos", str(pos)]
+    if primary:
+        cmd.extend(["--primary", "--preferred"])
+    try:
+        check_call(cmd)
+        return True
+    except CalledProcessError:
+        return False
+
+
+# Power off a screen
+def power_off(screen):
+    cmd = ["xrandr", "--output", screen, "--off"]
+    try:
+        check_call(cmd)
+        return True
+    except CalledProcessError:
+        return False
+
+
+# Set a pattern saved in config
+def set_pattern(config, pattern):
+    config = config[pattern]
+    primary = config["primary"].replace(" ", "")
+    screen = config["screen"].replace(" ", "").split(",")
+    status = config["status"].replace(" ", "").split(",")
+    mode = config["mode"].replace(" ", "").split(",")
+    brightness = config["brightness"].replace(" ", "").split(",")
+    refresh = config["refresh"].replace(" ", "").split(",")
+    pos = config["pos"].replace(" ", "").split(",")
+    connected = config.getboolean("connected", fallback = True)
+
+    c = 0
+    def get_item(value, scr, c):
+        if len(value) < len(scr):
+            return value[0]
+        else:
+            return value[c]
+
+    if connected:
+        for i in screen:
+            if not(is_connected(i)):
+                return False
+
+    while c < len(screen):
+        scr = screen[c]
+        stat = get_item(status, screen, c)
+        mod = get_item(mode, screen, c)
+        bht = get_item(brightness, screen, c)
+        rfh = get_item(refresh, screen, c)
+        ps = get_item(pos, screen, c)
+        c += 1
+        if stat == "on":
+            prim = scr == primary
+            if not(set_xrandr(scr, mod, bht, rfh, prim, ps)):
+                return False
+        else:
+            if not(power_off(scr)):
+                return False
+
+    return True
+
+
+# Main Script
+if __name__ == "__main__":
+    if not check_xrandr():
+        print("[fixscr] 'xrandr' not found, please make sure that you have 'xradr' and its listed in your $PATH.")
+        quit(1)
+
+    config = ConfigParser()
+    config_file = getenv("HOME")+"/.fixscr"
+    config.read(config_file)
+
+    if len(argv) > 1:
+        if argv[1] == "list":
+            print("List of Patterns in %s:" % config_file)
+            for i in config.sections():
+                print("\t%s" % i)
+        elif argv[1] == "help":
+            pass
+        elif argv[1] in config.sections():
+            set_pattern(config, argv[1])
+            sleep(0.5)
+            set_pattern(config, argv[1])
+        else:
+            pass
+    else:
+        set_pattern(config, "DEFAULT")
+        sleep(0.5)
+        set_pattern(config, "DEFAULT")

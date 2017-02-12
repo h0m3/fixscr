@@ -20,11 +20,13 @@
 # Feel free to contact me at dr.hoome@gmail.com.
 #
 
-from subprocess import check_call, check_output, DEVNULL, CalledProcessError, STDOUT
+from subprocess import check_call, check_output, CalledProcessError, STDOUT
 from sys import argv
 from os import getenv
 from configparser import ConfigParser
 from time import sleep
+
+DEVNULL = open("/dev/null", 'w')
 
 
 # Check if xrandr is installed
@@ -46,7 +48,8 @@ def is_connected(screen):
 
 # Set xrandr mode for a Screen
 def set_xrandr(screen, mode, brightness=1, refresh=60, primary=False, pos="0x0"):
-    cmd = ["xrandr",
+    cmd = [
+        "xrandr",
         "--output", screen,
         "--mode", mode,
         "--refresh", str(refresh),
@@ -81,9 +84,10 @@ def set_pattern(config, pattern):
     brightness = config["brightness"].replace(" ", "").split(",")
     refresh = config["refresh"].replace(" ", "").split(",")
     pos = config["pos"].replace(" ", "").split(",")
-    connected = config.getboolean("connected", fallback = True)
+    connected = config.getboolean("connected", fallback=True)
 
     c = 0
+
     def get_item(value, scr, c):
         if len(value) < len(scr):
             return value[0]
@@ -134,6 +138,7 @@ def show_help(config_file):
     print("This is free software, and you are welcome to redistribute it")
     print("under certain conditions; see LICENSE file for details.")
     quit(0)
+
 
 # Main Section
 if __name__ == "__main__":

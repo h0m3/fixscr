@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Simple Python Script to read ~/.fixscr and create a pattern of screen setups
+# Simple pattern setup for screens
 # Then easly switch between then. For more information see github.com/h0m3/fixscr
 #
 # Copyright (C) 2017  Artur 'h0m3' Paiva
@@ -115,9 +115,25 @@ def set_pattern(config, pattern):
 
 
 # Show help
-def show_help():
-    pass
-
+def show_help(config_file):
+    print("Usage: %s [option] or [pattern]\n" % argv[0])
+    print("fixscr: Simple pattern setup for screens")
+    print("If no option is given, set to 'DEFAULT' pattern")
+    print("You can define patterns at %s" % config_file)
+    print("See http://www.github.com/h0m3/fixscr\n")
+    print("Valid options:")
+    print("\tlist \tList all avaliable patterns at %s" % config_file)
+    print("\thelp \tShow this help")
+    print("\nExit Status:")
+    print("\t0 Exit OK")
+    print("\t1 Missing 'xrandr' executable")
+    print("\t2 Failed to set some pattern")
+    print("\t3 Pattern/Option not found")
+    print("\n\nfixscr Copyright (C) 2017  Artur 'h0m3' Paiva")
+    print("This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE file.")
+    print("This is free software, and you are welcome to redistribute it")
+    print("under certain conditions; see LICENSE file for details.")
+    quit(0)
 
 # Main Section
 if __name__ == "__main__":
@@ -135,7 +151,7 @@ if __name__ == "__main__":
             for i in config.sections():
                 print("\t%s" % i)
         elif argv[1] == "help":
-            show_help()
+            show_help(config_file)
         elif argv[1] in config.sections():
             set_pattern(config, argv[1])
             sleep(0.5)

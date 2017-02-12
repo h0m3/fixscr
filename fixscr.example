@@ -1,3 +1,5 @@
+# Put your config in ~/.fixscr
+
 [DEFAULT] # Default config, necessary
 primary = HDMI1  # Primary Screen
 screen = HDMI1, VGA1  # List of screens separated by comma

@@ -1,0 +1,46 @@
+[DEFAULT] # Default config, necessary
+primary = HDMI1  # Primary Screen
+screen = HDMI1, VGA1  # List of screens separated by comma
+status = on, on  # Status of screens when calling this pattern
+mode = 1920x1080, 1366x768  # Screen Modes when calling this pattern (see more with 'xrandr')
+brightness = 1, 1  # Screens Brgithness
+refresh = 60, 60  # Screens refresh rate
+pos = 1366x0, 0x312  # Screens position
+connected = no  # If 'yes' this pattern will only apply when all listed screens are connected
+
+# Different config, example, gaming
+[game]
+primary = HDMI1
+screen = HDMI1, VGA1 # The settings are in sequency, the same as the screens
+status = on, off
+mode = 1360x768
+brightness = 1
+refresh = 60
+connected = yes
+pos = 0x0 # All settings are necessary, no setting is optional
+
+
+# You can simplify common settings by setting only one parameter for all screens
+[simple]
+primary = HDMI1
+screen = HDMI1, VGA1
+status = on # All screens on
+mode = 1366x768 # Same Mode
+brightness = 1 # Same Brightness
+refresh = 60 # 60 Hz on all
+connected = yes
+pos = 0x0 # Same position on all
+
+# You can use/setup only one screen
+[one-screen]
+primary = HDMI1
+screen = HDMI1
+status = on
+mode = 1920x1080
+brightness = 1
+refresh = 60
+connected = no
+pos = 0x0
+
+# No pattern other than DEFAULT is necessary
+# Commentaries can be added with hashtag (#)

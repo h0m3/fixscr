@@ -26,6 +26,7 @@ from os import getenv
 from configparser import ConfigParser
 from time import sleep
 
+
 # Check if xrandr is installed
 def check_xrandr():
     try:
@@ -104,19 +105,24 @@ def set_pattern(config, pattern):
         c += 1
         if stat == "on":
             prim = scr == primary
-            if not(set_xrandr(scr, mod, bht, rfh, prim, ps)):
+            if is_connected(scr) and not(set_xrandr(scr, mod, bht, rfh, prim, ps)):
                 return False
         else:
-            if not(power_off(scr)):
+            if is_connected(scr) and not(power_off(scr)):
                 return False
 
     return True
 
 
-# Main Script
+# Show help
+def show_help():
+    pass
+
+
+# Main Section
 if __name__ == "__main__":
     if not check_xrandr():
-        print("[fixscr] 'xrandr' not found, please make sure that you have 'xradr' and its listed in your $PATH.")
+        print("fixscr: 'xrandr' not found, please make sure that you have 'xradr' and its listed in your $PATH.")
         quit(1)
 
     config = ConfigParser()
@@ -129,14 +135,19 @@ if __name__ == "__main__":
             for i in config.sections():
                 print("\t%s" % i)
         elif argv[1] == "help":
-            pass
+            show_help()
         elif argv[1] in config.sections():
             set_pattern(config, argv[1])
             sleep(0.5)
             set_pattern(config, argv[1])
         else:
-            pass
+            print("fixscr: '%s' pattern not found!" % argv[1])
+            print("Try %s help for more information." % argv[0])
+            quit(3)
     else:
-        set_pattern(config, "DEFAULT")
-        sleep(0.5)
-        set_pattern(config, "DEFAULT")
+        if not(set_pattern(config, "DEFAULT")):
+            print("fixscr: failed to set pattern")
+            quit(2)
+        else:
+            sleep(0.5)
+            set_pattern(config, "DEFAULT")

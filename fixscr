@@ -20,16 +20,23 @@
 # Feel free to contact me at dr.hoome@gmail.com.
 #
 
-from subprocess import check_call, check_output, CalledProcessError, STDOUT
-from sys import argv
-from os import getenv
-from configparser import ConfigParser
-from time import sleep
+try:
+    from subprocess import check_call, check_output, CalledProcessError, STDOUT
+    from sys import argv
+    from os import getenv
+    from os.path import isfile
+    from configparser import ConfigParser
+    from time import sleep
+except ImportError:
+    print("fixscr: Missing Python 'core' Libraries.")
+    print("See more at https://github.com/h0m3/fixscr/wiki/Installation")
+    quit(1)
+
 
 DEVNULL = open("/dev/null", 'w')
 
 
-# Check if xrandr is installed
+# Check if xrandr is installede
 def check_xrandr():
     try:
         check_call(["xrandr"], stdout=DEVNULL, stderr=DEVNULL)
@@ -132,7 +139,7 @@ def show_help(config_file):
     print("\t0 Exit OK")
     print("\t1 Missing 'xrandr' executable")
     print("\t2 Failed to set some pattern")
-    print("\t3 Pattern/Option not found")
+    print("\t3 Pattern/Option not found or config file missing")
     print("\n\nfixscr Copyright (C) 2017  Artur 'h0m3' Paiva")
     print("This program comes with ABSOLUTELY NO WARRANTY; for details see LICENSE file.")
     print("This is free software, and you are welcome to redistribute it")
@@ -143,11 +150,18 @@ def show_help(config_file):
 # Main Section
 if __name__ == "__main__":
     if not check_xrandr():
-        print("fixscr: 'xrandr' not found, please make sure that you have 'xradr' and its listed in your $PATH.")
+        print("fixscr: 'xrandr' not found, please make sure that you have 'xrandr' and its listed in your $PATH.")
+        print("See more at https://github.com/h0m3/fixscr/wiki/Installation")
         quit(1)
 
     config = ConfigParser()
     config_file = getenv("HOME")+"/.fixscr"
+
+    if not isfile(config_file):
+        print("fixscr: Missing config file %s, please make sure that the config file exists and its correctly set up.")
+        print("See more at https://github.com/h0m3/fixscr/wiki/Configuration")
+        quit(3)
+
     config.read(config_file)
 
     if len(argv) > 1:
@@ -155,6 +169,8 @@ if __name__ == "__main__":
             print("List of Patterns in %s:" % config_file)
             for i in config.sections():
                 print("\t%s" % i)
+        elif argv[1] == "show":
+            check_call(["xrandr"])
         elif argv[1] == "help":
             show_help(config_file)
         elif argv[1] in config.sections():

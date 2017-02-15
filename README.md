@@ -20,8 +20,8 @@ be available in fixscr.
 
 The config file is really simple and reminds a simple `xorg.conf` file.
 
-You can see the example `fixscr.example` inside this repository or see the wiki where
-every option is available.
+You can see the example `fixscr.example` inside this repository or see the [wiki](https://github.com/h0m3/fixscr/wiki) where
+every option is explained.
 
 Then you just type `fixscr pattern` or `fixscr` in any terminal emulator or execute dialog (ALT+F2) to load a screen setup.
 
@@ -32,29 +32,6 @@ You can define, in only one pattern, the setup of any or all of your screens/mon
 And you can define as many patterns as you want.
 
 I have a default pattern where my laptop screen and my main monitor is on, and other that if the main monitor is plugged in it shuts down the laptop screen for playing games, called `games`. And i can simply call `fixscr games` to switch.
-
-### How to use
-
-4 Easy steps:
-
-1. Make sure that you have all [dependencies](#dependencies) shown below.
-2. Copy the fixscr file to your executable path (my recommendation is `/usr/local/bin`).
-3. Create a `~/fixscr` with your patterns following the example and the wiki.
-4. You're Ready.
-
-### Dependencies
-
-fixscr is written using Python and some core libraries. Currently it needs at least Python 2.7 installed (all modern unix system should have this available as a package, except gentoo haha ;).
-
-fixscr also need some core python libraries:
-
-* `subpcorcess`
-* `sys`
-* `os`
-* `configparser`
-* `time`
-
-Besides Python, fixscr also needs `xrandr` utility from xorg. fixscr uses `xrandr` and probabily will not work with other window systems such as wayland.
 
 ### Licensing
 
